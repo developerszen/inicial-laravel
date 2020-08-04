@@ -12,6 +12,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('authors/{id}', 'AuthorController@update');
     Route::delete('authors/{id}', 'AuthorController@destroy');
 
+    Route::get('categories', 'CategoryController@index');
+    Route::post('categories', 'CategoryController@store');
+    Route::get('categories/{id}', 'CategoryController@show');
+    Route::put('categories/{id}', 'CategoryController@update');
+    Route::delete('categories/{id}', 'CategoryController@destroy');
+
+    Route::get('books', 'BookController@index');
+    Route::post('books', 'BookController@store');
+    Route::get('books/{id}', 'BookController@show');
+    Route::put('books/{id}', 'BookController@update');
+    Route::delete('books/{id}', 'BookController@destroy');
+
 });
 
 
