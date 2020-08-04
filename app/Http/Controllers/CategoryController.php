@@ -47,6 +47,12 @@ class CategoryController extends Controller
     function destroy ($id) {
         $category = Category::findOrFail($id);
 
+        if($category->book()->exists()) {
+            return response()->json([
+                'error' => 'integrity violation'
+            ], 500);
+        }
+
         $category->delete();
 
         return response([], 204);

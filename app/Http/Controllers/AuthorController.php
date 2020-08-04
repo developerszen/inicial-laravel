@@ -47,6 +47,14 @@ class AuthorController extends Controller
     function destroy ($id) {
         $author = Author::findOrFail($id);
 
+        $relation = $author->books;
+
+        if (count($relation)) {
+            return response()->json([
+                'error' => 'integrity violation'
+            ], 500);
+        }
+
         $author->delete();
 
         return response([], 204);

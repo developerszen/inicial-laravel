@@ -20,6 +20,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('books', 'BookController@index');
     Route::post('books', 'BookController@store');
+    Route::get('books/resources', 'BookController@resources');
+    Route::get('books/{id}/edit', 'BookController@edit');
     Route::get('books/{id}', 'BookController@show');
     Route::put('books/{id}', 'BookController@update');
     Route::delete('books/{id}', 'BookController@destroy');

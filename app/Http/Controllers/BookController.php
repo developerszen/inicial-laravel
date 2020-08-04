@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Book;
+use App\Category;
+use App\Author;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -12,7 +15,9 @@ class BookController extends Controller
             'category' => function ($query) {
                 return $query->select(['id', 'name']);
             }
-        ])->get(['id', 'category_id', 'title', 'image', 'created_at']);
+        ])
+            ->latest()
+            ->get(['id', 'category_id', 'title', 'image', 'created_at']);
 
         return $books;
     }
@@ -63,6 +68,48 @@ class BookController extends Controller
         return $book;
     }
 
+    function edit($id) {
+        $book = Book::select('id', 'category_id', 'title', 'synopsis', 'image')->findOrFail($id);
+
+        $book->authors = $book->authors()->pluck('authors.id')->toArray();
+
+        return $book;
+    }
+
+    function update(Request $request, $id) {
+        $request->validate([
+            'authors' => 'required|array',
+            'authors.*' => 'exists:authors,id',
+            'category_id' => 'required|exists:categories,id',
+            'title' => 'required|string',
+            'synopsis' => 'required|string',
+            'image' => 'nullable|image',
+        ]);
+
+        $path = null;
+        $book = Book::findOrFail($id);
+
+        $book->update([
+            'category_id' => $request->input('category_id'),
+            'title' => $request->input('title'),
+            'synopsis' => $request->input('synopsis'),
+        ]);
+
+        if ($request->hasFile('image')) {
+            Storage::delete($book->image);
+
+            $path = $request->file('image')->store('images/books');
+        }
+
+        $book->update([
+           'image' => $path,
+        ]);
+
+        $book->authors()->sync($request->input('authors'));
+
+        return $book;
+    }
+
     function destroy($id) {
         $book = Book::findOrFail($id);
 
@@ -71,4 +118,10 @@ class BookController extends Controller
         return response([], 204);
     }
 
+    function resources() {
+        $categories = Category::latest()->get(['id', 'name']);
+        $authors = Author::latest()->get(['id', 'name']);
+
+        return response()->json(compact('categories', 'authors'));
+    }
 }
