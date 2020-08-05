@@ -4,7 +4,15 @@ Route::post('login', 'AuthController@login');
 
 Route::middleware(['auth:api'])->group(function () {
 
+    Route::post('users/verify-email', 'UserController@verifyEmail');
+
+});
+
+Route::middleware(['auth:api', 'email_verified'])->group(function () {
+
     Route::post('logout', 'AuthController@logout');
+
+    Route::post('users', 'UserController@store');
 
     Route::get('authors', 'AuthorController@index');
     Route::post('authors', 'AuthorController@store');
