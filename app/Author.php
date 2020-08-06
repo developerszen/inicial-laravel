@@ -11,7 +11,7 @@ class Author extends Model
 
     protected $fillable = ['name'];
 
-    protected $hidden = ['pivot'];
+    protected $hidden = ['deleted_at', 'pivot'];
 
     function books() {
         return $this->belongsToMany(Book::class);

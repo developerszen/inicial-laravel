@@ -117,6 +117,7 @@ return [
     'uploaded' => 'The :attribute failed to upload.',
     'url' => 'The :attribute format is invalid.',
     'uuid' => 'The :attribute must be a valid UUID.',
+    'alpha_custom' => 'El campo :attribute solo puede contener letras, espacios y puntos.',
 
     /*
     |--------------------------------------------------------------------------

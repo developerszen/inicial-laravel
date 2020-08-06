@@ -16,6 +16,7 @@ Route::middleware(['auth:api', 'email_verified'])->group(function () {
 
     Route::get('authors', 'AuthorController@index');
     Route::post('authors', 'AuthorController@store');
+    Route::get('authors/{id}/edit', 'AuthorController@edit');
     Route::get('authors/{id}', 'AuthorController@show');
     Route::put('authors/{id}', 'AuthorController@update');
     Route::delete('authors/{id}', 'AuthorController@destroy');

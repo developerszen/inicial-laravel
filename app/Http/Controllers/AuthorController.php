@@ -8,13 +8,24 @@ use Illuminate\Http\Request;
 class AuthorController extends Controller
 {
     function index () {
-        $authors = Author::get(['id', 'name', 'created_at']);
+        $authors = Author::latest()->withCount('books')->get(['id', 'name', 'created_at']);
         return $authors;
     }
 
     function store (Request $request) {
         $request->validate([
-            'name' => 'required|string',
+            'name' => [
+                'required',
+                'string',
+                'max:80',
+                function ($attribute, $value, $fail) {
+                    $regex = preg_match('/^[\pL\.\s]+$/u', $value);
+
+                    if ($regex) return;
+
+                    $fail(trans('validation.alpha_custom'));
+                }
+            ],
         ]);
 
         $author = Author::create([
@@ -32,7 +43,7 @@ class AuthorController extends Controller
 
     function update(Request $request, $id) {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:80',
         ]);
 
         $author = Author::findOrFail($id);
@@ -41,6 +52,11 @@ class AuthorController extends Controller
             'name' => $request->input('name'),
         ]);
 
+        return $author;
+    }
+
+    function edit($id) {
+        $author = Author::select('id', 'name')->findOrFail($id);
         return $author;
     }
 

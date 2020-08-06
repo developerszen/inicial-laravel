@@ -31,6 +31,15 @@ class UserController extends Controller
 
     function verifyEmail(Request $request) {
         $user = User::where('email_verified_token', $request->query('email_verified_token'))->firstOrFail();
+
+        $user->update([
+            'email_verified_at' => now(),
+            'email_verified_token' => null,
+        ]);
+
+        return response([
+            'success' => 'Email verified',
+        ]);
     }
 
     private function generateToken() {
