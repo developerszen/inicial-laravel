@@ -10,14 +10,30 @@ use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-    function index() {
-        $books = Book::with([
-            'category' => function ($query) {
-                return $query->select(['id', 'name']);
-            }
-        ])
-            ->latest()
-            ->get(['id', 'category_id', 'title', 'image', 'created_at']);
+    function index(Request $request) {
+        $books = Book::latest()
+            ->when($request->has('title'), function ($query) use ($request) {
+                $title = $request->query('title');
+                $query->where('title', 'like', '%' . $title . '%');
+            })
+            ->when($request->has('category'), function ($query) use ($request) {
+                $category = $request->query('category');
+                $query->where('category_id', $category);
+            })
+            ->when($request->has('author'), function ($query) use ($request) {
+
+                $query->whereHas('authors', function ($query) use ($request) {
+                    $query->where('author_book.author_id', $request->query('author'));
+                });
+
+            })
+            ->with([
+                'category' => function ($query) {
+                    return $query->select(['id', 'name']);
+                }
+            ])
+                ->latest()
+                ->get(['id', 'category_id', 'title', 'image', 'created_at']);
 
         return $books;
     }

@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     function store(Request $request) {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|alpha_custom',
             'email' => 'email|unique:users,email',
             'password' => 'required|string',
         ]);

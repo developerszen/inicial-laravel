@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Author;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AuthorController extends Controller
 {
-    function index () {
-        $authors = Author::latest()->withCount('books')->get(['id', 'name', 'created_at']);
+    function index (Request $request) {
+        $authors = Author::latest()
+            ->when($request->has('name'), function ($query) use ($request) {
+                $name = $request->query('name');
+                $query->where('name', 'like', '%' . $name . '%');
+            })
+            ->withCount('books')
+            ->get(['id', 'name', 'created_at']);
         return $authors;
     }
 
@@ -18,13 +25,19 @@ class AuthorController extends Controller
                 'required',
                 'string',
                 'max:80',
-                function ($attribute, $value, $fail) {
-                    $regex = preg_match('/^[\pL\.\s]+$/u', $value);
-
-                    if ($regex) return;
-
-                    $fail(trans('validation.alpha_custom'));
-                }
+                'alpha_custom',
+//                'unique:authors,name',
+                Rule::unique('authors')
+                ->where(function ($query) {
+                    return $query->where('deleted_at', null);
+                }),
+//                function ($attribute, $value, $fail) {
+//                    $regex = preg_match('/^[\pL\.\s]+$/u', $value);
+//
+//                    if ($regex) return;
+//
+//                    $fail(trans('validation.alpha_custom'));
+//                }
             ],
         ]);
 
@@ -43,7 +56,15 @@ class AuthorController extends Controller
 
     function update(Request $request, $id) {
         $request->validate([
-            'name' => 'required|string|max:80',
+            'name' => [
+                'required',
+                'string',
+                'max:80',
+                Rule::unique('authors')
+                    ->where(function ($query) {
+                        return $query->where('deleted_at', null);
+                    })->ignore($id),
+            ],
         ]);
 
         $author = Author::findOrFail($id);

@@ -7,8 +7,14 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    function index () {
-        $categories = Category::get(['id', 'name', 'created_at']);
+    function index (Request $request) {
+        $categories = Category::
+            when($request->has('name'), function ($query) use ($request) {
+                $name = $request->query('name');
+                $query->where('name', 'like', '%' . $name . '%');
+            })
+        ->get(['id', 'name', 'created_at']);
+
         return $categories;
     }
 
