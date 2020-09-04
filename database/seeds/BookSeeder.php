@@ -19,6 +19,8 @@ class BookSeeder extends Seeder
         $books->each(function ($book) use ($categories) {
             $book->category_id = $categories->random()->id;
             $book->save();
+
+            $book->authors()->attach([1, 6]);
         });
     }
 }

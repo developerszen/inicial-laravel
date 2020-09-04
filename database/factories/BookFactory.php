@@ -10,6 +10,6 @@ $factory->define(Book::class, function (Faker $faker) {
         'user_id' => 1,
         'title' => $faker->sentence(4),
         'synopsis' => $faker->paragraph(6),
-        'image' => $faker->imageUrl(),
+        'image' => $faker->randomElement([null, $faker->imageUrl()]),
     ];
 });
