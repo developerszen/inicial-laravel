@@ -17,6 +17,7 @@ class AuthController extends Controller
         ]);
 
         $credentials = $request->only(['email', 'password']);
+
         $remember = $request->input('remember');
 
         $token = auth()->setTTL($this->getTTL($remember))->attempt($credentials);

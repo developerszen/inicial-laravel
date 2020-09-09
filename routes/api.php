@@ -12,6 +12,15 @@ Route::middleware(['auth'])->group(function () {
     Route::put('authors/{id}', 'AuthorController@update');
     Route::delete('authors/{author}', 'AuthorController@destroy');
 
+    Route::get('categories', 'CategoryController@index');
+    Route::post('categories', 'CategoryController@store');
+    Route::get('categories/{id}', 'CategoryController@show');
+    Route::get('categories/{id}/edit', 'CategoryController@edit');
+    Route::put('categories/{id}', 'CategoryController@update');
+    Route::delete('categories/{category}', 'CategoryController@destroy');
+
+    Route::get('books/{book}/edit', 'BookController@edit');
+    Route::apiResource('books', 'BookController');
 });
 
 
