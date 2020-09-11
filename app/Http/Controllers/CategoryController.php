@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     function index () {
-        $categories = Category::latest()->get(['id', 'name', 'created_at']);
+        $categories = Category::latest()->withCount('book')->get(['id', 'name', 'created_at']);
         return $categories;
     }
 

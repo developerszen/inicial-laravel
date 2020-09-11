@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -116,8 +117,18 @@ class BookController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+            Storage::delete($book->image);
+
             $path = $request->file('image')->store('images/books');
         }
+
+        $book->update([
+            'image' => $path,
+        ]);
+
+        $book->authors()->sync($request->input('authors'));
+
+        return $book;
     }
 
     /**

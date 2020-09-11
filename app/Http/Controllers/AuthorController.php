@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class AuthorController extends Controller
 {
     function index () {
-        $authors = Author::latest()->get(['id', 'name', 'created_at']);
+        $authors = Author::latest()->withCount('books')->get(['id', 'name', 'created_at']);
         return $authors;
     }
 

@@ -1,5 +1,6 @@
 <?php
 Route::post('login', 'AuthController@login');
+Route::post('request-password-recovery', 'UserController@requestPasswordRecovery');
 
 Route::middleware(['auth'])->group(function () {
 
