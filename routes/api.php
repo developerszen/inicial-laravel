@@ -1,8 +1,9 @@
 <?php
 Route::post('login', 'AuthController@login');
 Route::post('request-password-recovery', 'UserController@requestPasswordRecovery');
+Route::post('password-recovery', 'UserController@passwordRecovery');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'reset_token_verify'])->group(function () {
 
     Route::post('logout', 'AuthController@logout');
 
@@ -22,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('books/{book}/edit', 'BookController@edit');
     Route::apiResource('books', 'BookController');
+
 });
 
 
