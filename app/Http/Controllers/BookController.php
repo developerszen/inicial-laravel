@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Author;
 use App\Book;
+use App\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +15,7 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $books = Book::with([
             'category' => function ($query) {
@@ -21,7 +23,25 @@ class BookController extends Controller
             }
         ])
             ->latest()
-            ->get(['id', 'category_id', 'title', 'image', 'created_at']);
+            ->when($request->has('title'), function ($query) use ($request) {
+                $title = $request->query('title');
+                $query->where('title', 'like', '%' . $title . '%');
+            })
+            ->when($request->has('author'), function ($query) use ($request) {
+
+                $query->whereHas('authors', function ($query) use ($request) {
+                    $author = $request->query('author');
+                    $query->where('author_id', $author);
+                });
+
+            })
+            ->when($request->has('category'), function ($query) use ($request) {
+                $category = $request->query('category');
+                $query->where('category_id', $category);
+
+            })
+            ->select(['id', 'category_id', 'title', 'image', 'created_at'])
+            ->paginate(5);
 
         return $books;
     }
@@ -73,7 +93,7 @@ class BookController extends Controller
     {
         $book = Book::with([
             'category' => function ($query) {
-                return $query->select(['id', 'name']);
+                return $query->withFields();
             },
             'user' => function ($query) {
                 return $query->select(['id', 'name']);
@@ -87,7 +107,21 @@ class BookController extends Controller
     }
 
     function edit($book) {
-        return Book::select('id', 'category_id', 'title', 'synopsis', 'image')->findOrFail($book);
+        return Book::with([
+            'category' => function ($query) {
+                return $query->withFields();
+            },
+            'authors' => function ($query) {
+                return $query->select(['authors.id', 'name']);
+            }
+        ])
+        ->select('id', 'category_id', 'title', 'synopsis', 'image')
+            ->findOrFail($book);
+
+//        $book = Book::select('id', 'category_id', 'title', 'synopsis', 'image')->findOrFail($book);
+//        $book->authors = $book->authors()->pluck('authors.id')->toArray();
+//
+//        return $book;
     }
 
     /**
@@ -142,5 +176,12 @@ class BookController extends Controller
         $book->delete();
 
         return response([], 204);
+    }
+
+    function resources() {
+        $categories = Category::latest()->get(['id', 'name']);
+        $authors = Author::latest()->get(['id', 'name']);
+
+        return response(compact('categories', 'authors'));
     }
 }

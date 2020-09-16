@@ -22,7 +22,10 @@ Route::middleware(['auth', 'reset_token_verify'])->group(function () {
     Route::delete('categories/{category}', 'CategoryController@destroy');
 
     Route::get('books/{book}/edit', 'BookController@edit');
+    Route::get('books/resources', 'BookController@resources');
     Route::apiResource('books', 'BookController');
+
+    Route::apiResource('capitulos', 'ChapterController');
 
 });
 

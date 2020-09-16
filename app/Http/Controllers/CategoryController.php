@@ -7,8 +7,15 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    function index () {
-        $categories = Category::latest()->withCount('book')->get(['id', 'name', 'created_at']);
+    function index (Request $request) {
+        $categories = Category::latest()
+            ->withCount('book')
+            ->when($request->has('name'), function ($query) use ($request) {
+                $name = $request->query('name');
+                $query->where('name', 'like', '%' . $name . '%');
+            })
+            ->select(['id', 'name', 'created_at'])
+            ->paginate(5);
         return $categories;
     }
 

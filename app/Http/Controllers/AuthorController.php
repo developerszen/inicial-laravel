@@ -11,11 +11,12 @@ class AuthorController extends Controller
     function index (Request $request) {
         $authors = Author::latest()
             ->withCount('books')
-            ->when(false, function ($query) use ($request) {
+            ->when($request->has('name'), function ($query) use ($request) {
                 $name = $request->query('name');
                 $query->where('name', 'like', '%' . $name . '%');
             })
-            ->get(['id', 'name', 'created_at']);
+            ->select(['id', 'name', 'created_at'])
+            ->paginate(5);
         return $authors;
     }
 

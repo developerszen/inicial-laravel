@@ -16,4 +16,12 @@ class Category extends Model
     function book() {
         return $this->hasOne(Book::class);
     }
+
+    function scopeWithFields($query) {
+        if(false) {
+            return $query->select(['id', 'name']);
+        }
+
+        return $query->select(['id', 'name', 'created_at']);
+    }
 }
